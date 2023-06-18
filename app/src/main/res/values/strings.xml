@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">idVerifier</string>
+    <string name="security_name">Sis Security_101</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="security_open_drawer">Sod</string>
+    <string name="security_close_drawer">Scd</string>
+
+    <string name="admin_open_drawer">Aod</string>
+    <string name="admin_close_drawer">Acd</string>
+
+    <string name="securityHome">In the home page of security</string>
+    <string name="securityProfile">In the Profile page of security</string>
+    <string name="securityNotifications">In the Notifications Page of Security</string>
+    <string name="admin_name">Admin_101</string>
+    <string name="hello_blank_fragment_Notifications">In the Notifications Page of Admin</string>
+    <string name="student_name">Student_101</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nv_student_edit_profile" android:icon="@drawable/baseline_mode_edit_24" android:title="Edit Profile"/>
+    <item android:id="@+id/nv_student_logout" android:icon="@drawable/baseline_logout_24" android:title="Logout" />
+    <item android:id="@+id/nv_student_login" android:icon="@drawable/baseline_login_24" android:title="Login"/>
+    <item android:id="@+id/nv_student_contactus" android:icon="@drawable/baseline_contacts_24" android:title="Contact Us"/>
+    <item android:id="@+id/nv_student_rate" android:icon="@drawable/baseline_star_rate_24" android:title="Give Rating"/>
+
+</menu>

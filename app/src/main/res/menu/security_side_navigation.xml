@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nv_security_home" android:icon="@drawable/baseline_home_24" android:title="Home"/>
+    <item android:id="@+id/nv_security_verified_history" android:icon="@drawable/baseline_verified_user_24" android:title="Verfied History"/>
+    <item android:id="@+id/nv_security_profile" android:icon="@drawable/baseline_person_24" android:title="Profile"/>
+    <item android:id="@+id/nv_security_logout" android:icon="@drawable/baseline_logout_24" android:title="logout"/>
+    <item android:id="@+id/nv_security_login" android:icon="@drawable/baseline_login_24" android:title="Login"/>
+    <item android:id="@+id/nv_security_contactus" android:icon="@drawable/baseline_contacts_24" android:title="Contact Us"/>
+    <item android:id="@+id/nv_security_rate" android:icon="@drawable/baseline_star_rate_24" android:title="Give Rating"/>
+</menu>
