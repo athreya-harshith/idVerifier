@@ -1,5 +1,5 @@
 package com.example.idverifier;
-
+//this is used as adapter for issued gatePass
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,6 +34,9 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class gatePassAdapter extends FirebaseRecyclerAdapter<gatePass,gatePassAdapter.myViewHolder> {
     /**
@@ -157,7 +160,15 @@ public class gatePassAdapter extends FirebaseRecyclerAdapter<gatePass,gatePassAd
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful())
+                {
+                    //here adding the time of issuing the gatePass
+                    String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                    String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                    String issuedDateAndTime = currentTime+"  "+currentDate;
+                    model.setIssuedTime(issuedDateAndTime);
                     addToIssued(uid,model);
+                }
+
             }
         });
     }

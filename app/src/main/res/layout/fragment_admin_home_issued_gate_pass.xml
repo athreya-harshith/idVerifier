@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".adminHomeIssuedGatePass">
+    android:orientation="vertical"
+    tools:context=".adminHomeIssuedGatePass"
+    android:paddingBottom="15dp">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="In the admin issued gate pass fragment sub fragment of admin home" />
+        android:layout_height="wrap_content"
+        android:id="@+id/issuedGpassRecyclerView"
+        android:padding="10dp"/>
 
-</FrameLayout>
+</LinearLayout>

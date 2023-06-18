@@ -3,10 +3,15 @@ package com.example.idverifier;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +51,9 @@ public class adminHomeIssuedGatePass extends Fragment {
         return fragment;
     }
 
+    RecyclerView issuedGpassRecyclerView;
+
+    gatePassIssuedAdapter gpIssuedAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +67,27 @@ public class adminHomeIssuedGatePass extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_home_issued_gate_pass, container, false);
+        View view = inflater.inflate(R.layout.fragment_admin_home_issued_gate_pass, container, false);
+        issuedGpassRecyclerView = view.findViewById(R.id.issuedGpassRecyclerView);
+        issuedGpassRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+
+        FirebaseRecyclerOptions<gatePass> options =
+                new FirebaseRecyclerOptions.Builder<gatePass>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("IssuedGatePass"), gatePass.class)
+                        .build();
+        gpIssuedAdapter = new gatePassIssuedAdapter(options,getContext(),getActivity());
+        issuedGpassRecyclerView.setAdapter(gpIssuedAdapter);
+
+        return view;
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        gpIssuedAdapter.startListening();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        gpIssuedAdapter.stopListening();
     }
 }

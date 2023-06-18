@@ -4,7 +4,17 @@ public class gatePass
 {
     //implementation pending
 
-    public String gpassId;// its url to the qr code
+    public String gpassId;
+
+    public String getIssuedTime() {
+        return issuedTime;
+    }
+
+    public void setIssuedTime(String issuedTime) {
+        this.issuedTime = issuedTime;
+    }
+
+    public String issuedTime;// its url to the qr code
     public String uid;
 
     public String getName() {
@@ -50,6 +60,16 @@ public class gatePass
         this.toDestination = toDestination;
         this.reason = reason;
         this.travelDate = travelDate;
+    }
+
+    public gatePass(String uid, String name,String email,String toDestination, String reason, String travelDate,String issueDate) {
+        this.uid = uid;
+        this.name = name;
+        this.email = email;
+        this.toDestination = toDestination;
+        this.reason = reason;
+        this.travelDate = travelDate;
+        this.issuedTime = issueDate;
     }
 
     public String getGpassId() {
