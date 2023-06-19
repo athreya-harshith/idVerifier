@@ -120,6 +120,8 @@ public class studentHome extends Fragment {
     CardView gPassCardView;
     LinearLayout gPassLayout,gPassRootLayout;
     TextView gPassStatus;
+
+    public static final String REQUESTED="GatePass Requested",ISSUED="GatePass Issued";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -275,6 +277,68 @@ public class studentHome extends Fragment {
                 int v = (gPassLayout.getVisibility() == View.GONE)?View.VISIBLE : View.GONE;
                 TransitionManager.beginDelayedTransition(gPassRootLayout,new AutoTransition());
                 gPassLayout.setVisibility(v);
+            }
+        });
+
+        // for updating the gatePass status
+        FirebaseDatabase.getInstance().getReference().child("GatePassRequests").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if(snapshot.getKey().equals(studentUid))
+                    gPassStatus.setText(studentHome.REQUESTED);
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getKey().equals(studentUid))
+                    gPassStatus.setText("No Gate Passes");
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference().child("IssuedGatePass").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if(snapshot.getKey().equals(studentUid))
+                    gPassStatus.setText(studentHome.ISSUED);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getKey().equals(studentUid))
+                    gPassStatus.setText("No Gate Passes");
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
