@@ -8,9 +8,12 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,7 +117,9 @@ public class studentHome extends Fragment {
     Button requestGpassBtn;
     public static final String IN = "Inside Campus",OUT = "Outside Campus";
 
-
+    CardView gPassCardView;
+    LinearLayout gPassLayout,gPassRootLayout;
+    TextView gPassStatus;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -126,8 +131,10 @@ public class studentHome extends Fragment {
         studentHomeUemail = view.findViewById(R.id.studentHomeUserEmail);
         studentHomeUserCurrentStatus = view.findViewById(R.id.studentHomeUserCurrentStatus);
         studentHomeRequestGatePass = view.findViewById(R.id.studentHomeRequestGatePass);
-
-
+        gPassCardView = view.findViewById(R.id.studentHomeGPassCardView);
+        gPassRootLayout = view.findViewById(R.id.gPassRootLayout);
+        gPassLayout = view.findViewById(R.id.studentHomeGpassLayout);
+        gPassStatus = view.findViewById(R.id.studentHomeGpassStatus);
         gatePassDialog =  new Dialog(getActivity());
         gatePassDialog.setContentView(R.layout.request_gatepass_dialog_box);
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
@@ -259,6 +266,15 @@ public class studentHome extends Fragment {
                 }
 
                 gatePassDialog.dismiss();
+            }
+        });
+
+        gPassCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int v = (gPassLayout.getVisibility() == View.GONE)?View.VISIBLE : View.GONE;
+                TransitionManager.beginDelayedTransition(gPassRootLayout,new AutoTransition());
+                gPassLayout.setVisibility(v);
             }
         });
 

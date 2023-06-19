@@ -54,6 +54,51 @@
                     android:textStyle="bold"
                     android:id="@+id/studentHomeUserCurrentStatus"/>
 
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/studentHomeGPassCardView"
+                    android:layout_marginTop="20dp"
+                    >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/gPassRootLayout">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="GatePass :"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/studentHomeGpassStatus"
+                                android:text=" No Passes Found "/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/studentHomeGpassLayout"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="random for testing "
+                                />
+                        </LinearLayout>
+
+
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
 
 
