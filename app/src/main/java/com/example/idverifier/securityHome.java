@@ -40,6 +40,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.journeyapps.barcodescanner.CaptureActivity;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
@@ -111,22 +112,21 @@ public class securityHome extends Fragment {
     FloatingActionButton securityHomeScanBtn;
     Dialog scanDialog;
     ImageView scanDialogImg;
-    TextView scanDialogUname,scanDialogUemail,scanDialogUbranch;
+    TextView scanDialogUname,scanDialogUemail,scanDialogUbranch,scanDialogOutMode;
     Button scandialogAllowBtn,scanDialogRejectBtn;
     Vibrator vibrator;
     String uidAfterScan,uNameAfterScan,securityName;
     RecyclerView checkoutRecyclerView;
     checkOutAdapter cOutAdapter;
+
+    public static final String ID = "id",GPASS = "gatePass";
+    private  boolean checkId = false;// to identify whether the qr is id or gpass
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_security_home, container, false);
 
-//        addUserDialog = new Dialog(getActivity());//use getActivity for fragments
-//        addUserDialog.setContentView(R.layout.add_users_dialogue_box);
-//        addUserDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//        addUserDialog.getWindow().setBackgroundDrawable(ResourcesCompat.getDrawable(getActivity().getResources(),R.drawable.custom_dialogue_shape,null));
         securityHomeScanBtn = view.findViewById(R.id.securityHomeScanBtn);
         scanDialog = new Dialog(getActivity());
         scanDialog.setContentView(R.layout.secruity_scan_dialog);
@@ -141,7 +141,7 @@ public class securityHome extends Fragment {
         scanDialogUname = scanDialog.findViewById(R.id.securityScanUname);
         scanDialogUemail = scanDialog.findViewById(R.id.securityScanUemail);
         scanDialogUbranch = scanDialog.findViewById(R.id.securityScanUbranch);
-
+        scanDialogOutMode = scanDialog.findViewById(R.id.scanDialogOutMode);
         vibrator = (Vibrator)getActivity().getSystemService(Context.VIBRATOR_SERVICE);
 
         checkoutRecyclerView = view.findViewById(R.id.securityHomeCheckoutRecyclerView);
@@ -163,6 +163,7 @@ public class securityHome extends Fragment {
         scandialogAllowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // if currentStatus is 1 then inside the campus else outside the campus
                 FirebaseDatabase.getInstance().getReference().child("Users").child("Student").child(uidAfterScan).child("currentStatus").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -175,7 +176,12 @@ public class securityHome extends Fragment {
                                     {
                                         String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
                                         String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-                                        checkOut userOut = new checkOut(uidAfterScan,uNameAfterScan,checkOut.ID_MODE,currentTime,currentDate,securityName);
+                                        checkOut userOut ;
+                                        if(checkId)
+                                            userOut = new checkOut(uidAfterScan,uNameAfterScan,checkOut.ID_MODE,currentTime,currentDate,securityName);
+                                        else
+                                            userOut =  new checkOut(uidAfterScan,uNameAfterScan,checkOut.GATEPASS_MODE,currentTime,currentDate,securityName);
+
                                         FirebaseDatabase.getInstance().getReference().child("CheckOut").child(uidAfterScan).setValue(userOut).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -189,25 +195,88 @@ public class securityHome extends Fragment {
                                         Toast.makeText(getContext(),"Unable to Verify",Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+                            if(!checkId)
+                            {
+                                // code here for the gatePass modification
+                                FirebaseDatabase.getInstance().getReference().child("IssuedGatePass").child(uidAfterScan).child("validity").setValue(1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful())
+                                            Toast.makeText(getContext(),"Updated the GPass Validity",Toast.LENGTH_SHORT).show();
+                                        else
+                                            Toast.makeText(getContext(),"Failed to Update the GPass Validity",Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }
                         else {
-                            FirebaseDatabase.getInstance().getReference().child("Users").child("Student").child(uidAfterScan).child("currentStatus").setValue(1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            // if not in campus then 2 cases 1.went out with ID, or 2.Went out with Gpass
+                            // check through the CheckOut table(the mode filed ) and then handle the details
+                            // for entering inside the campus, showing id or gatePass is enough
+                            // check in checkOut table and take the validity expiration of gatePass if mode is gpass
+
+                            FirebaseDatabase.getInstance().getReference().child("CheckOut").child(uidAfterScan).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful())
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                    String previousOutMode = snapshot.child("mode").getValue(String.class);
+
+                                    if(previousOutMode.equals(securityHome.GPASS))
                                     {
-                                        FirebaseDatabase.getInstance().getReference().child("CheckOut").child(uidAfterScan).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        FirebaseDatabase.getInstance().getReference().child("IssuedGatePass").child(uidAfterScan).setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful())
-                                                    Toast.makeText(getContext(), "Verified successfully for getting in", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getContext(),"Issued Gate Pass has been deleted",Toast.LENGTH_SHORT).show();
+                                                else
+                                                    Toast.makeText(getContext(),"Failed in deleting Issued Gate Pass",Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                        // remove from Student
+                                        FirebaseDatabase.getInstance().getReference().child("Users").child("Student").child(uidAfterScan).child("gPass").setValue(null).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                            }
+                                        });
+                                        // remove from firebase storage
+
+                                        FirebaseStorage.getInstance().getReference().child("gatePassQr").child(uidAfterScan).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful())
+                                                    Toast.makeText(getContext(),"Revoked the GatePass Qr",Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     }
-                                    else
-                                        Toast.makeText(getContext(), "Unable to Verify", Toast.LENGTH_SHORT).show();
+                                    FirebaseDatabase.getInstance().getReference().child("Users").child("Student").child(uidAfterScan).child("currentStatus").setValue(1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful())
+                                            {
+                                                FirebaseDatabase.getInstance().getReference().child("CheckOut").child(uidAfterScan).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful())
+                                                            Toast.makeText(getContext(), "Verified successfully for getting in", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                            }
+                                            else
+                                                Toast.makeText(getContext(), "Unable to Verify", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
                                 }
                             });
+
+
                         }
                         scanDialog.dismiss();
                     }
@@ -253,15 +322,6 @@ public class securityHome extends Fragment {
         public void onActivityResult(ScanIntentResult result) {
             if(result.getContents() != null)
             {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-//                builder.setTitle("Result");
-//                builder.setMessage(result.getContents());
-//                builder.setPositiveButton("OK ", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        dialogInterface.dismiss();
-//                    }
-//                }).show();
                 if(vibrator.hasVibrator())
                 {
                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -278,21 +338,28 @@ public class securityHome extends Fragment {
                 pd.setTitle("Processing");
                 pd.setMessage("Fetching the Student Details ....");
                 String received = result.getContents();
-                String [] contents = received.split("##",2);
+                String [] contents = received.split("##",3);
                 Log.d("The contents array ****** ",String.valueOf(contents.length));
                 if(contents.length ==2 || contents.length ==3)
                 {
+                    if(contents.length==2)
+                        checkId = true;// scanned a idCard
+                    else
+                        checkId = false;// scanned a QrCode
                     // this is for id content length is 2 uid##email
                     String receivedEmail = contents[1];
                     String receivedUid = contents[0];
+//
                     uidAfterScan = receivedUid;
                     pd.show();
+                    // to check whether the student is registered or not
                     FirebaseAuth.getInstance().fetchSignInMethodsForEmail(receivedEmail).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                         @Override
                         public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                             boolean check = !task.getResult().getSignInMethods().isEmpty();
                             if(check)
                             {
+                                // comes here if the student details exists
                                 FirebaseDatabase.getInstance().getReference().child("Users").child("Student").child(receivedUid).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -308,6 +375,10 @@ public class securityHome extends Fragment {
                                                 scanDialogUbranch.setText(student.getBranch());
                                             else
                                                 scanDialogUbranch.setText("No Branch Mentioned");
+                                            if(checkId)
+                                                scanDialogOutMode.setText(securityHome.ID);
+                                            else
+                                                scanDialogOutMode.setText(securityHome.GPASS);
                                             pd.dismiss();
                                             scanDialog.show();
                                         }
@@ -315,7 +386,7 @@ public class securityHome extends Fragment {
 
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error)
-                                    {
+                                    {// it has email registered but the account is not present in realtime database
                                         pd.dismiss();
                                         Toast.makeText(getContext(),"No such User Exists",Toast.LENGTH_SHORT).show();
                                     }
@@ -323,6 +394,7 @@ public class securityHome extends Fragment {
                             }
                             else
                             {
+                                // comes here if the student is not registered
                                 pd.dismiss();
                                 Toast.makeText(getContext(),"Invalid QR code",Toast.LENGTH_SHORT).show();
                             }
