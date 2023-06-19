@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -286,6 +287,16 @@ public class studentHome extends Fragment {
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText(studentHome.REQUESTED);
+                gatePass gp;
+                gp = snapshot.getValue(gatePass.class);
+                View view = getLayoutInflater().inflate(R.layout.student_gatepass_requested,null,false);
+                TextView tv = view.findViewById(R.id.gpassDestination);
+                tv.setText(gp.getToDestination());
+                tv = view.findViewById(R.id.gpassTravellingDate);
+                tv.setText(gp.getTravelDate());
+                tv = view.findViewById(R.id.gpassReason);
+                tv.setText(gp.getReason());
+                gPassLayout.addView(view);
 
             }
 
@@ -317,6 +328,7 @@ public class studentHome extends Fragment {
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText(studentHome.ISSUED);
+
             }
 
             @Override
