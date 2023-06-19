@@ -119,9 +119,11 @@ public class studentHome extends Fragment {
     public static final String IN = "Inside Campus",OUT = "Outside Campus";
 
     CardView gPassCardView;
-    LinearLayout gPassLayout,gPassRootLayout;
+    LinearLayout gPassLayout,gPassRootLayout,issuedGpassLayout;
     TextView gPassStatus;
 
+    LinearLayout expandForGatePass;
+    Dialog gpDialog;
     public static final String REQUESTED="GatePass Requested",ISSUED="GatePass Issued";
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -138,6 +140,8 @@ public class studentHome extends Fragment {
         gPassRootLayout = view.findViewById(R.id.gPassRootLayout);
         gPassLayout = view.findViewById(R.id.studentHomeGpassLayout);
         gPassStatus = view.findViewById(R.id.studentHomeGpassStatus);
+
+        expandForGatePass = view.findViewById(R.id.gpExpandForGatePass);
         gatePassDialog =  new Dialog(getActivity());
         gatePassDialog.setContentView(R.layout.request_gatepass_dialog_box);
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
@@ -150,6 +154,12 @@ public class studentHome extends Fragment {
         requestGpassBtn = gatePassDialog.findViewById(R.id.requestGatePassBtn);
         dateLayout = gatePassDialog.findViewById(R.id.selectDate);
         selectedDate = gatePassDialog.findViewById(R.id.selectedDate);
+
+        // gatePass Dialog for the student
+        gpDialog = new Dialog(getActivity());
+        gpDialog.setContentView(R.layout.gatepass_dialog);
+        gpDialog.getWindow().setLayout(width,ViewGroup.LayoutParams.WRAP_CONTENT);
+        gpDialog.getWindow().setBackgroundDrawable(ResourcesCompat.getDrawable(getActivity().getResources(),R.drawable.custom_dialogue_shape,null));
 
         studentHomeUname.setText(getArguments().getString("name"));
         studentHomeUemail.setText(getArguments().getString("email"));
@@ -272,7 +282,8 @@ public class studentHome extends Fragment {
             }
         });
 
-        gPassCardView.setOnClickListener(new View.OnClickListener() {
+
+        expandForGatePass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int v = (gPassLayout.getVisibility() == View.GONE)?View.VISIBLE : View.GONE;
@@ -283,13 +294,14 @@ public class studentHome extends Fragment {
 
         // for updating the gatePass status
         FirebaseDatabase.getInstance().getReference().child("GatePassRequests").addChildEventListener(new ChildEventListener() {
+            View view;
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText(studentHome.REQUESTED);
                 gatePass gp;
                 gp = snapshot.getValue(gatePass.class);
-                View view = getLayoutInflater().inflate(R.layout.student_gatepass_requested,null,false);
+                view = getLayoutInflater().inflate(R.layout.student_gatepass_requested,null,false);
                 TextView tv = view.findViewById(R.id.gpassDestination);
                 tv.setText(gp.getToDestination());
                 tv = view.findViewById(R.id.gpassTravellingDate);
@@ -309,6 +321,7 @@ public class studentHome extends Fragment {
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText("No Gate Passes");
+                gPassLayout.removeView(view);
 
             }
 
@@ -324,11 +337,31 @@ public class studentHome extends Fragment {
         });
 
         FirebaseDatabase.getInstance().getReference().child("IssuedGatePass").addChildEventListener(new ChildEventListener() {
+            View view;
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText(studentHome.ISSUED);
+                gatePass gp;
+                gp = snapshot.getValue(gatePass.class);
+                view = getLayoutInflater().inflate(R.layout.issued_gatepass,null,false);
+                // continue from here after dinner
+                ImageView gPassQr = view.findViewById(R.id.issuedGpassQr);
+                if(getActivity()== null)
+                    return;
+                Glide.with(getContext()).load(gp.getGpassId()).into(gPassQr);
+                TextView tv = view.findViewById(R.id.issuedGpassDestination);
+                tv.setText(gp.getToDestination());
+                tv = view.findViewById(R.id.issuedGpassDateOfTravelling);
+                tv.setText(gp.getTravelDate());
+                tv = view.findViewById(R.id.issuedGpassReason);
+                tv.setText(gp.getReason());
+                tv = view.findViewById(R.id.issuedGpassIssuedTime);
+                tv.setText(gp.getIssuedTime());
+                gPassLayout.addView(view);
+                issuedGpassLayout = view.findViewById(R.id.issuedGpassLayout);
 
+                showGatePassDialog(gp,issuedGpassLayout);
             }
 
             @Override
@@ -340,6 +373,7 @@ public class studentHome extends Fragment {
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getKey().equals(studentUid))
                     gPassStatus.setText("No Gate Passes");
+                gPassLayout.removeView(view);
 
             }
 
@@ -354,6 +388,29 @@ public class studentHome extends Fragment {
             }
         });
 
+
+
         return view;
+    }
+
+    private void showGatePassDialog(gatePass gpIssued,LinearLayout issuedGpassLayout) {
+        ImageView gpQr = gpDialog.findViewById(R.id.gPassDialogQr);
+
+        TextView tv = gpDialog.findViewById(R.id.gpDialogToDestinatin);
+        tv.setText(gpIssued.getToDestination());
+        tv = gpDialog.findViewById(R.id.gpDialogReason);
+        tv.setText(gpIssued.getReason());
+        tv = gpDialog.findViewById(R.id.gpDialogTravelDate);
+        tv.setText(gpIssued.getTravelDate());
+        tv = gpDialog.findViewById(R.id.gpDialogIssuedDate);
+        tv.setText(gpIssued.getIssuedTime());
+        issuedGpassLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(getActivity() != null)
+                    Glide.with(getContext()).load(gpIssued.getGpassId()).into(gpQr);
+                gpDialog.show();
+            }
+        });
     }
 }
