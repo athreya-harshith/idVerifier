@@ -78,7 +78,7 @@ public class student extends AppCompatActivity
                 }
                 else if(id == R.id.bn_student_nav_complaints)
                 {
-                    loadStudentFragment(new studentComplaints(),true);
+                    loadStudentFragment(studentComplaints.getInstance(bundle),true);
                     checkClicked = true;
                     return  true;
                 }

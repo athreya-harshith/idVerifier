@@ -20,6 +20,7 @@ public class WrapContentLinearLayoutManager extends LinearLayoutManager {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+
     //... constructor
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
