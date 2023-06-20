@@ -3,10 +3,15 @@ package com.example.idverifier;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +60,32 @@ public class adminNotificationsComplaints extends Fragment {
         }
     }
 
+    RecyclerView adminComplaintsRecyclerView;
+    complaintsAdapter complainAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_notifications_complaints, container, false);
+        View view =inflater.inflate(R.layout.fragment_admin_notifications_complaints, container, false);
+        adminComplaintsRecyclerView = view.findViewById(R.id.adminNotificationsComplaintRecyclerView);
+        adminComplaintsRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL,false));
+        FirebaseRecyclerOptions<complaints> options =
+                new FirebaseRecyclerOptions.Builder<complaints>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("Complaints"), complaints.class)
+                        .build();
+        complainAdapter = new complaintsAdapter(options);
+        adminComplaintsRecyclerView.setAdapter(complainAdapter);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        complainAdapter.startListening();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        complainAdapter.stopListening();
     }
 }
