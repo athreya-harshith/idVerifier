@@ -68,7 +68,10 @@ public class studentNotifications extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_student_notifications, container, false);
         notificationsRecyclerView = view.findViewById(R.id.studentNotificationsRecyclerView);
-        notificationsRecyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        WrapContentLinearLayoutManager wm = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        wm.setReverseLayout(true);
+        wm.setStackFromEnd(true);
+        notificationsRecyclerView.setLayoutManager(wm);
         FirebaseRecyclerOptions<notification> options =
                 new FirebaseRecyclerOptions.Builder<notification>()
                         .setQuery(FirebaseDatabase.getInstance().getReference().child("AdminNotifications"), notification.class)

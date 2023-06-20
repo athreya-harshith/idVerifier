@@ -4,13 +4,17 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -58,6 +62,8 @@ public class adminNotificationsNotify extends Fragment {
     TextInputEditText adminNotifications;
     TextInputLayout textInputLayoutNotifications;
     String adminName ,adminUid;
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,16 +85,20 @@ public class adminNotificationsNotify extends Fragment {
     String enteredMsg;
     String notificationTitle,notificationText;
 
-
+    RecyclerView adminNotificationsRecyclerView;
+    notificationsAdapter notifyAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // for adjsuting the screen size
+        if(getActivity() != null)
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_admin_notifications_notify, container, false);
         textInputLayoutNotifications = view.findViewById(R.id.adminNotificationsNotifyTextInputLayout);
         adminNotifications= view.findViewById(R.id.adminNotificationsNotify);
 
-
+        adminNotificationsRecyclerView = view.findViewById(R.id.adminNotificationRecyclerView);
         textInputLayoutNotifications.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +142,25 @@ public class adminNotificationsNotify extends Fragment {
                 }
             }
         });
+
+        WrapContentLinearLayoutManager wm = new WrapContentLinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        adminNotificationsRecyclerView.setLayoutManager(wm);
+        FirebaseRecyclerOptions<notification> options =
+                new FirebaseRecyclerOptions.Builder<notification>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference().child("AdminNotifications"), notification.class)
+                        .build();
+        notifyAdapter = new notificationsAdapter(options);
+        adminNotificationsRecyclerView.setAdapter(notifyAdapter);
         return view;
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        notifyAdapter.startListening();
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        notifyAdapter.stopListening();
     }
 }
