@@ -118,7 +118,6 @@ public class studentHome extends Fragment {
     Button requestGpassBtn;
     public static final String IN = "Inside Campus",OUT = "Outside Campus";
 
-    CardView gPassCardView;
     LinearLayout gPassLayout,gPassRootLayout,issuedGpassLayout;
     TextView gPassStatus;
 
@@ -136,7 +135,6 @@ public class studentHome extends Fragment {
         studentHomeUemail = view.findViewById(R.id.studentHomeUserEmail);
         studentHomeUserCurrentStatus = view.findViewById(R.id.studentHomeUserCurrentStatus);
         studentHomeRequestGatePass = view.findViewById(R.id.studentHomeRequestGatePass);
-        gPassCardView = view.findViewById(R.id.studentHomeGPassCardView);
         gPassRootLayout = view.findViewById(R.id.gPassRootLayout);
         gPassLayout = view.findViewById(R.id.studentHomeGpassLayout);
         gPassStatus = view.findViewById(R.id.studentHomeGpassStatus);
@@ -297,18 +295,24 @@ public class studentHome extends Fragment {
             View view;
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                if(getActivity() == null)
+                    return;
                 if(snapshot.getKey().equals(studentUid))
+                {
                     gPassStatus.setText(studentHome.REQUESTED);
-                gatePass gp;
-                gp = snapshot.getValue(gatePass.class);
-                view = getLayoutInflater().inflate(R.layout.student_gatepass_requested,null,false);
-                TextView tv = view.findViewById(R.id.gpassDestination);
-                tv.setText(gp.getToDestination());
-                tv = view.findViewById(R.id.gpassTravellingDate);
-                tv.setText(gp.getTravelDate());
-                tv = view.findViewById(R.id.gpassReason);
-                tv.setText(gp.getReason());
-                gPassLayout.addView(view);
+
+                    gatePass gp;
+                    gp = snapshot.getValue(gatePass.class);
+                    view = getLayoutInflater().inflate(R.layout.student_gatepass_requested,null,false);
+                    TextView tv = view.findViewById(R.id.gpassDestination);
+                    tv.setText(gp.getToDestination());
+                    tv = view.findViewById(R.id.gpassTravellingDate);
+                    tv.setText(gp.getTravelDate());
+                    tv = view.findViewById(R.id.gpassReason);
+                    tv.setText(gp.getReason());
+                    gPassLayout.addView(view);
+                }
+
 
             }
 
@@ -320,8 +324,11 @@ public class studentHome extends Fragment {
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getKey().equals(studentUid))
+                {
                     gPassStatus.setText("No Gate Passes");
-                gPassLayout.removeView(view);
+                    gPassLayout.removeView(view);
+                }
+
 
             }
 
@@ -340,28 +347,32 @@ public class studentHome extends Fragment {
             View view;
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if(snapshot.getKey().equals(studentUid))
-                    gPassStatus.setText(studentHome.ISSUED);
-                gatePass gp;
-                gp = snapshot.getValue(gatePass.class);
-                view = getLayoutInflater().inflate(R.layout.issued_gatepass,null,false);
-                // continue from here after dinner
-                ImageView gPassQr = view.findViewById(R.id.issuedGpassQr);
                 if(getActivity()== null)
                     return;
-                Glide.with(getContext()).load(gp.getGpassId()).into(gPassQr);
-                TextView tv = view.findViewById(R.id.issuedGpassDestination);
-                tv.setText(gp.getToDestination());
-                tv = view.findViewById(R.id.issuedGpassDateOfTravelling);
-                tv.setText(gp.getTravelDate());
-                tv = view.findViewById(R.id.issuedGpassReason);
-                tv.setText(gp.getReason());
-                tv = view.findViewById(R.id.issuedGpassIssuedTime);
-                tv.setText(gp.getIssuedTime());
-                gPassLayout.addView(view);
-                issuedGpassLayout = view.findViewById(R.id.issuedGpassLayout);
+                if(snapshot.getKey().equals(studentUid))
+                {
+                    gPassStatus.setText(studentHome.ISSUED);
 
-                showGatePassDialog(gp,issuedGpassLayout);
+                    gatePass gp;
+                    gp = snapshot.getValue(gatePass.class);
+                    view = getLayoutInflater().inflate(R.layout.issued_gatepass,null,false);
+                    // continue from here after dinner
+                    ImageView gPassQr = view.findViewById(R.id.issuedGpassQr);
+                    Glide.with(getContext()).load(gp.getGpassId()).into(gPassQr);
+                    TextView tv = view.findViewById(R.id.issuedGpassDestination);
+                    tv.setText(gp.getToDestination());
+                    tv = view.findViewById(R.id.issuedGpassDateOfTravelling);
+                    tv.setText(gp.getTravelDate());
+                    tv = view.findViewById(R.id.issuedGpassReason);
+                    tv.setText(gp.getReason());
+                    tv = view.findViewById(R.id.issuedGpassIssuedTime);
+                    tv.setText(gp.getIssuedTime());
+                    gPassLayout.addView(view);
+                    issuedGpassLayout = view.findViewById(R.id.issuedGpassLayout);
+
+                    showGatePassDialog(gp,issuedGpassLayout);
+                }
+
             }
 
             @Override
@@ -372,8 +383,11 @@ public class studentHome extends Fragment {
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getKey().equals(studentUid))
+                {
                     gPassStatus.setText("No Gate Passes");
-                gPassLayout.removeView(view);
+                    gPassLayout.removeView(view);
+                }
+
 
             }
 
