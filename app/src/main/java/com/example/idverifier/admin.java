@@ -9,12 +9,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class admin extends AppCompatActivity
 {
@@ -116,6 +118,14 @@ public class admin extends AppCompatActivity
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 //                yet to be completed later
 //                dont forget
+                int id = item.getItemId();
+                if(id == R.id.nv_admin_logout)
+                {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(admin.this,loginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return true;
             }
         });
