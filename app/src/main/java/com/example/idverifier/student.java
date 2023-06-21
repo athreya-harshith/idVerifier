@@ -9,11 +9,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class student extends AppCompatActivity
 {
@@ -98,6 +100,14 @@ public class student extends AppCompatActivity
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
 //                to be completed here
+                int id = item.getItemId();
+                if(id == R.id.nv_student_logout)
+                {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(student.this,loginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 return  true;
             }
         });

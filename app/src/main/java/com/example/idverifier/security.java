@@ -10,12 +10,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class security extends AppCompatActivity {
 
@@ -117,6 +119,10 @@ public class security extends AppCompatActivity {
                 else if(id == R.id.nv_security_logout)
                 {
                     Toast.makeText(security.this,"Logging Out !!!!! ", Toast.LENGTH_SHORT).show();
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(security.this,loginActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
                 else if(id == R.id.nv_security_login)
                 {

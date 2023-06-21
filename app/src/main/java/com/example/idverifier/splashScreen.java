@@ -27,7 +27,7 @@ public class splashScreen extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         scanAnimation = findViewById(R.id.scanAnimation);
 
-        scanAnimation.animate().translationX(-2000).setDuration(1500).setStartDelay(3280);
+        scanAnimation.animate().translationX(-2000).setDuration(500).setStartDelay(3280);
 
         new Handler().postDelayed(new Runnable() {
             @Override
