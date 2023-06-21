@@ -39,6 +39,8 @@ public class loginActivity extends AppCompatActivity
     // testing on this
 
     private DatabaseReference database ;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -160,6 +162,7 @@ public class loginActivity extends AppCompatActivity
             }
         });
     }
+  
 
     public Bundle getUserDataBundle(DataSnapshot snapshot,String uid)
     {

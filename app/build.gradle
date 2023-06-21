@@ -49,5 +49,6 @@ dependencies {
     //firebase ui dependency
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
 
-    //circle imageView
+    //lottie animation
+    implementation 'com.airbnb.android:lottie:6.0.1'
 }
