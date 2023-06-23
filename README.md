@@ -1,1 +1,2 @@
-#idVerifier
+#idVerifier\
+Android Application for Verification
